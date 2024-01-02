@@ -51,11 +51,7 @@ public class BankServiceImpl implements BankService {
     @Override
     public Account getAccount(Long accountNumber) {
         Optional<Account> account = bankRepository.findById(accountNumber);
-        if(account.isPresent())
-        {
-            return account.get();
-        }
-        return null;
+        return account.orElse(null);
     }
 
     @Override
