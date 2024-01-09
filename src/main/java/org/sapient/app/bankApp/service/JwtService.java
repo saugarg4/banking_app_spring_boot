@@ -1,4 +1,4 @@
-package org.sapient.app.bankApp.configuration;
+package org.sapient.app.bankApp.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
