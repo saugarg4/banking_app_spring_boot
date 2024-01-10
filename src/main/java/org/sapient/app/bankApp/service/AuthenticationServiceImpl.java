@@ -40,8 +40,10 @@ public class AuthenticationServiceImpl {
         var user = customerAuthRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken= jwtService.generateToken(user);
+        Long accountNumber = (user.getAccount() == null) ? 0 : user.getAccount().getAccountNumber();
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .accountNumber(accountNumber)
                 .build();
     }
 }

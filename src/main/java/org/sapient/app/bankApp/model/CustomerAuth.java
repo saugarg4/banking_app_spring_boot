@@ -24,6 +24,9 @@ public class CustomerAuth implements UserDetails {
     private String email;
     private String password;
 
+    @OneToOne
+    @JoinColumn(name = "account_number ")
+    private Account account;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
