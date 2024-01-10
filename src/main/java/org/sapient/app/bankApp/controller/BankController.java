@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/bank")
+@CrossOrigin(origins = "http://localhost:3000")
 public class BankController {
 
     private final BankServiceImpl bankService;
@@ -31,11 +32,11 @@ public class BankController {
         }
     }
 
-    @GetMapping("/getAccount")
-    public ResponseEntity<Account> getAccount(@RequestBody Map<String, String> json) {
+    @GetMapping("/getAccount/{accountNumber}")
+    public ResponseEntity<Account> getAccount(@PathVariable("accountNumber") Long accountNumber) {
         try {
 
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
+//            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             Account account = bankService.getAccount(accountNumber);
             if (account == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -46,10 +47,9 @@ public class BankController {
         }
     }
 
-    @PutMapping("/depositMoney/{amount}")
-    public ResponseEntity<Float> depositMoney(@PathVariable("amount") float amount, @RequestBody Map<String, String> json) {
+    @PutMapping("/depositMoney/{accountNumber}/{amount}")
+    public ResponseEntity<Float> depositMoney(@PathVariable("amount") float amount, @PathVariable("accountNumber") Long accountNumber) {
         try {
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             float balance = bankService.depositMoney(accountNumber, amount);
             if (balance == -1) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -60,10 +60,9 @@ public class BankController {
         }
     }
 
-    @PutMapping("/withdrawMoney/{amount}")
-    public ResponseEntity<Float> withdrawMoney(@PathVariable("amount") float amount, @RequestBody Map<String, String> json) {
+    @PutMapping("/withdrawMoney/{accountNumber}/{amount}")
+    public ResponseEntity<Float> withdrawMoney(@PathVariable("amount") float amount, @PathVariable("accountNumber") Long accountNumber) {
         try {
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             float balance = bankService.withdrawMoney(accountNumber, amount);
             if (balance == -1) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -77,10 +76,9 @@ public class BankController {
     }
 
     //
-    @PutMapping("/applyFD/{amount}/{fdTenure}")
-    public ResponseEntity<Float> applyFD(@PathVariable("amount") float amount, @PathVariable("fdTenure") int fdTenure, @RequestBody Map<String, String> json) {
+    @PutMapping("/applyFD/{accountNumber}/{amount}/{fdTenure}")
+    public ResponseEntity<Float> applyFD(@PathVariable("amount") float amount, @PathVariable("fdTenure") int fdTenure, @PathVariable("accountNumber") Long accountNumber) {
         try {
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             float fdInterset = bankService.openBankFD(accountNumber, amount, fdTenure);
             if (fdInterset == -1) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -94,10 +92,9 @@ public class BankController {
         }
     }
 
-    @PutMapping("/applyLoan/{loanType}/{amount}/{loanTenure}")
-    public ResponseEntity<Float> applyLoan(@PathVariable("amount") float amount, @PathVariable("loanTenure") int loanTenure, @PathVariable("loanType") int loanType, @RequestBody Map<String, String> json) {
+    @PutMapping("/applyLoan/{accountNumber}/{loanType}/{amount}/{loanTenure}")
+    public ResponseEntity<Float> applyLoan(@PathVariable("amount") float amount, @PathVariable("loanTenure") int loanTenure, @PathVariable("loanType") int loanType, @PathVariable("accountNumber") Long accountNumber) {
         try {
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             float loanInterset = bankService.applyLoan(accountNumber, amount, loanTenure, loanType);
             if (loanInterset == -1) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -111,10 +108,9 @@ public class BankController {
         }
     }
 
-    @PutMapping("/applyCreditCard/{amount}")
-    public ResponseEntity<Float> applyCreditCard(@PathVariable("amount") float amount, @RequestBody Map<String, String> json) {
+    @PutMapping("/applyCreditCard/{accountNumber}/{amount}")
+    public ResponseEntity<Float> applyCreditCard(@PathVariable("amount") float amount, @PathVariable("accountNumber") Long accountNumber) {
         try {
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             float creditServiceCharge = bankService.applyCreditCard(accountNumber, amount);
             if (creditServiceCharge == -1) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

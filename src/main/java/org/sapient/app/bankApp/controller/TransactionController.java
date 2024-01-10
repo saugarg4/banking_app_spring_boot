@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/bank")
+@CrossOrigin(origins = "http://localhost:3000")
 public class TransactionController {
 
     private final BankServiceImpl bankService;
@@ -20,11 +21,9 @@ public class TransactionController {
         this.bankService = bankService;
     }
 
-    @GetMapping("/getTransactions")
-    public ResponseEntity<List<Transaction>> getTransactionsById(@RequestBody Map<String, String> json) {
+    @GetMapping("/getTransactions/{accountNumber}")
+    public ResponseEntity<List<Transaction>> getTransactionsById(@PathVariable("accountNumber") Long accountNumber) {
         try {
-
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             List<Transaction> transactions = bankService.getTransactionsById(accountNumber);
             if (transactions == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -35,11 +34,9 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/getTransactions/{transactionType}")
-    public ResponseEntity<List<Transaction>> getTransactionsByIdByType(@PathVariable("transactionType") String transactionType, @RequestBody Map<String, String> json) {
+    @GetMapping("/getTransactions/{accountNumber}/{transactionType}")
+    public ResponseEntity<List<Transaction>> getTransactionsByIdByType(@PathVariable("transactionType") String transactionType,@PathVariable("accountNumber") Long accountNumber) {
         try {
-
-            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             List<Transaction> transactions = bankService.getTransactionsByIdByType(accountNumber, transactionType);
             if (transactions == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

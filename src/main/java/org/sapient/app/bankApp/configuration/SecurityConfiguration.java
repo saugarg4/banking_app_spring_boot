@@ -25,12 +25,14 @@ public class SecurityConfiguration {
             "v3/api-docs/**",
             "/swagger-ui/**",
             "swagger-ui/**",
+            "/auth/**",
+            "/bank/**"
 
-            "/auth/**"
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .cors(cors->cors.configure(http))
                 .authorizeRequests().
                 requestMatchers("/bank/**").authenticated().requestMatchers(AUTH_WHITELIST).permitAll()
 
