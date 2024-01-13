@@ -1,10 +1,7 @@
 package org.sapient.app.bankApp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sapient.app.bankApp.model.AuthenticationRequest;
-import org.sapient.app.bankApp.model.AuthenticationResponse;
-import org.sapient.app.bankApp.model.CustomerAuth;
-import org.sapient.app.bankApp.model.RegisterRequest;
+import org.sapient.app.bankApp.model.*;
 import org.sapient.app.bankApp.repository.CustomerAuthRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,16 +15,23 @@ public class AuthenticationServiceImpl {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    public AuthenticationResponse register(RegisterRequest request) {
-        var user = CustomerAuth.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .build();
-        customerAuthRepository.save(user);
-        var jwtToken= jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+    public AuthenticationResponse register(RegisterRequest request){
+        var user = customerAuthRepository.findByEmail(request.getEmail())
+                .orElse(null);
+        if(user == null){
+            user = CustomerAuth.builder()
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .build();
+            customerAuthRepository.save(user);
+            var jwtToken= jwtService.generateToken(user);
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .build();
+        }
+        return null;
+
+
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -45,5 +49,17 @@ public class AuthenticationServiceImpl {
                 .token(jwtToken)
                 .accountNumber(accountNumber)
                 .build();
+    }
+
+    public Account findAccountByEmail(String email){
+        var user = customerAuthRepository.findByEmail(email).orElse(null);
+        return user != null ? user.getAccount() : null;
+    }
+
+    public void updateUserAuthAccount(Account account){
+        var user = customerAuthRepository.findByEmail(account.getCustomer().getCustomerEmail()).orElseThrow();
+        user.setAccount(account);
+        customerAuthRepository.save(user);
+
     }
 }

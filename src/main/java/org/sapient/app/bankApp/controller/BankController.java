@@ -1,9 +1,10 @@
 package org.sapient.app.bankApp.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.sapient.app.bankApp.model.Account;
 import org.sapient.app.bankApp.model.Customer;
+import org.sapient.app.bankApp.service.AuthenticationServiceImpl;
 import org.sapient.app.bankApp.service.BankServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,19 +14,20 @@ import java.util.Map;
 @RestController
 @RequestMapping("/bank")
 @CrossOrigin(origins = "http://localhost:3000")
+@RequiredArgsConstructor
 public class BankController {
 
     private final BankServiceImpl bankService;
-
-    @Autowired
-    public BankController(BankServiceImpl bankService) {
-        this.bankService = bankService;
-    }
+    private final AuthenticationServiceImpl authenticationService;
 
     @PostMapping("/createAccount/{amount}")
     public ResponseEntity<Account> createAccount(@PathVariable("amount") float amount, @RequestBody Customer customer) {
         try {
-            Account account = bankService.createBankAccount(customer, amount);
+            Account account = authenticationService.findAccountByEmail(customer.getCustomerEmail());
+            if(account == null){
+                account = bankService.createBankAccount(customer, amount);
+                authenticationService.updateUserAuthAccount(account);
+            }
             return new ResponseEntity<>(account, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -36,7 +38,6 @@ public class BankController {
     public ResponseEntity<Account> getAccount(@PathVariable("accountNumber") Long accountNumber) {
         try {
 
-//            Long accountNumber = Long.valueOf(json.get("accountNumber"));
             Account account = bankService.getAccount(accountNumber);
             if (account == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
